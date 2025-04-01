@@ -1,0 +1,1978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clustering Algorithms Visualization</title>
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        /* Header Styles */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #6B73FF 0%, #000DFF 100%);
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        /* Main Container */
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Control Panel */
+        .control-panel {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+        }
+
+        .control-group {
+            margin-bottom: 25px;
+        }
+
+        .control-group h3 {
+            margin-bottom: 15px;
+            color: #444;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 8px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        select, input, button {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #6B73FF;
+            box-shadow: 0 0 0 2px rgba(107, 115, 255, 0.2);
+        }
+
+        button {
+            background-color: #6B73FF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #5a62e0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Visualization Canvas */
+        .visualization {
+            flex: 2;
+            min-width: 600px;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        canvas {
+            width: 100%;
+            height: 600px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            display: block;
+        }
+
+        /* Algorithm Info */
+        .algorithm-info {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f0f4ff;
+            border-radius: 5px;
+            border-left: 4px solid #6B73FF;
+        }
+
+        .algorithm-info h3 {
+            margin-bottom: 10px;
+            color: #444;
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 8px;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            pointer-events: none;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        /* Responsive */
+        @media (max-width: 1000px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .visualization {
+                min-width: 100%;
+            }
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background-color: #eee;
+            border-radius: 4px;
+            margin-top: 15px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #6B73FF, #00D2FF);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Clustering Algorithms Visualization</h1>
+        <p class="subtitle">Interactive demonstration of various clustering techniques with animations</p>
+    </header>
+
+    <div class="container">
+        <div class="control-panel">
+            <div class="control-group">
+                <h3>Dataset Configuration</h3>
+                <label for="dataset-type">Dataset Type</label>
+                <select id="dataset-type">
+                    <option value="blobs">Blobs (Well-separated)</option>
+                    <option value="moons">Moons (Non-linear)</option>
+                    <option value="circles">Circles (Concentric)</option>
+                    <option value="random">Random (Uniform)</option>
+                    <option value="anisotropic">Anisotropic (Stretched)</option>
+                </select>
+
+                <label for="points-count">Number of Points</label>
+                <input type="range" id="points-count" min="50" max="500" value="200">
+                <span id="points-count-value">200</span> points
+
+                <label for="clusters-count">Number of Clusters</label>
+                <input type="range" id="clusters-count" min="2" max="10" value="3">
+                <span id="clusters-count-value">3</span> clusters
+
+                <label for="noise-level">Noise Level</label>
+                <input type="range" id="noise-level" min="0" max="0.5" step="0.01" value="0.05">
+                <span id="noise-level-value">0.05</span>
+            </div>
+
+            <div class="control-group">
+                <h3>Algorithm Selection</h3>
+                <label for="algorithm">Clustering Algorithm</label>
+                <select id="algorithm">
+                    <option value="kmeans">K-Means</option>
+                    <option value="dbscan">DBSCAN</option>
+                    <option value="hierarchical">Hierarchical</option>
+                    <option value="gmm">Gaussian Mixture</option>
+                    <option value="spectral">Spectral</option>
+                    <option value="optics">OPTICS</option>
+                    <option value="meanshift">Mean Shift</option>
+                    <option value="affinity">Affinity Propagation</option>
+                </select>
+
+                <div id="kmeans-params" class="algorithm-params">
+                    <label for="kmeans-iterations">Max Iterations</label>
+                    <input type="range" id="kmeans-iterations" min="1" max="50" value="10">
+                    <span id="kmeans-iterations-value">10</span> iterations
+                </div>
+
+                <div id="dbscan-params" class="algorithm-params" style="display: none;">
+                    <label for="dbscan-eps">Epsilon (ε)</label>
+                    <input type="range" id="dbscan-eps" min="0.01" max="0.5" step="0.01" value="0.1">
+                    <span id="dbscan-eps-value">0.1</span>
+
+                    <label for="dbscan-min-samples">Min Samples</label>
+                    <input type="range" id="dbscan-min-samples" min="1" max="20" value="5">
+                    <span id="dbscan-min-samples-value">5</span> samples
+                </div>
+
+                <div id="hierarchical-params" class="algorithm-params" style="display: none;">
+                    <label for="hierarchical-linkage">Linkage Method</label>
+                    <select id="hierarchical-linkage">
+                        <option value="single">Single</option>
+                        <option value="complete">Complete</option>
+                        <option value="average">Average</option>
+                        <option value="ward">Ward</option>
+                    </select>
+                </div>
+
+                <div id="gmm-params" class="algorithm-params" style="display: none;">
+                    <label for="gmm-covariance">Covariance Type</label>
+                    <select id="gmm-covariance">
+                        <option value="full">Full</option>
+                        <option value="tied">Tied</option>
+                        <option value="diag">Diagonal</option>
+                        <option value="spherical">Spherical</option>
+                    </select>
+                </div>
+
+                <div id="spectral-params" class="algorithm-params" style="display: none;">
+                    <label for="spectral-gamma">Gamma (Kernel Coefficient)</label>
+                    <input type="range" id="spectral-gamma" min="0.1" max="10" step="0.1" value="1">
+                    <span id="spectral-gamma-value">1</span>
+                </div>
+
+                <div id="optics-params" class="algorithm-params" style="display: none;">
+                    <label for="optics-xi">XI (Steepness threshold)</label>
+                    <input type="range" id="optics-xi" min="0.01" max="0.5" step="0.01" value="0.05">
+                    <span id="optics-xi-value">0.05</span>
+                </div>
+            </div>
+
+            <button id="generate-btn">Generate Dataset</button>
+            <button id="cluster-btn">Run Clustering</button>
+            <button id="reset-btn">Reset</button>
+
+            <div class="progress-container" id="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+        </div>
+
+        <div class="visualization">
+            <canvas id="cluster-canvas"></canvas>
+            
+            <div class="algorithm-info" id="algorithm-info">
+                <h3>K-Means Clustering</h3>
+                <p>K-Means is a centroid-based algorithm that partitions data into K distinct clusters based on distance metrics. It works by iteratively assigning points to the nearest centroid and recalculating centroids until convergence.</p>
+                <p><strong>Strengths:</strong> Simple, efficient for large datasets, works well with spherical clusters.</p>
+                <p><strong>Weaknesses:</strong> Requires specifying K, sensitive to initialization, struggles with non-spherical clusters.</p>
+            </div>
+
+            <div class="legend" id="legend">
+                <!-- Legend items will be dynamically added here -->
+            </div>
+        </div>
+    </div>
+
+    <div class="tooltip" id="tooltip"></div>
+
+    <script>
+        // Main application
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM elements
+            const canvas = document.getElementById('cluster-canvas');
+            const ctx = canvas.getContext('2d');
+            const generateBtn = document.getElementById('generate-btn');
+            const clusterBtn = document.getElementById('cluster-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const algorithmSelect = document.getElementById('algorithm');
+            const tooltip = document.getElementById('tooltip');
+            const algorithmInfo = document.getElementById('algorithm-info');
+            const progressContainer = document.getElementById('progress-container');
+            const progressBar = document.getElementById('progress-bar');
+            
+            // Canvas setup
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            
+            // State variables
+            let points = [];
+            let clusters = [];
+            let centroids = [];
+            let animationId = null;
+            let isAnimating = false;
+            let currentStep = 0;
+            let maxSteps = 1;
+            let colorPalette = [
+                '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8',
+                '#F06292', '#7986CB', '#9575CD', '#64B5F6', '#4DB6AC',
+                '#81C784', '#FFD54F', '#FF8A65', '#A1887F', '#90A4AE'
+            ];
+            
+            // Event listeners for sliders to update displayed values
+            document.getElementById('points-count').addEventListener('input', function() {
+                document.getElementById('points-count-value').textContent = this.value;
+            });
+            
+            document.getElementById('clusters-count').addEventListener('input', function() {
+                document.getElementById('clusters-count-value').textContent = this.value;
+            });
+            
+            document.getElementById('noise-level').addEventListener('input', function() {
+                document.getElementById('noise-level-value').textContent = this.value;
+            });
+            
+            document.getElementById('kmeans-iterations').addEventListener('input', function() {
+                document.getElementById('kmeans-iterations-value').textContent = this.value;
+            });
+            
+            document.getElementById('dbscan-eps').addEventListener('input', function() {
+                document.getElementById('dbscan-eps-value').textContent = this.value;
+            });
+            
+            document.getElementById('dbscan-min-samples').addEventListener('input', function() {
+                document.getElementById('dbscan-min-samples-value').textContent = this.value;
+            });
+            
+            document.getElementById('spectral-gamma').addEventListener('input', function() {
+                document.getElementById('spectral-gamma-value').textContent = this.value;
+            });
+            
+            document.getElementById('optics-xi').addEventListener('input', function() {
+                document.getElementById('optics-xi-value').textContent = this.value;
+            });
+            
+            // Show/hide algorithm parameters based on selection
+            algorithmSelect.addEventListener('change', function() {
+                // Hide all parameter sections
+                document.querySelectorAll('.algorithm-params').forEach(el => {
+                    el.style.display = 'none';
+                });
+                
+                // Show the selected one
+                const selectedAlgorithm = this.value;
+                document.getElementById(`${selectedAlgorithm}-params`).style.display = 'block';
+                
+                // Update algorithm info
+                updateAlgorithmInfo(selectedAlgorithm);
+            });
+            
+            // Generate random dataset
+            generateBtn.addEventListener('click', function() {
+                resetAnimation();
+                generateDataset();
+                drawPoints();
+                updateLegend();
+            });
+            
+            // Run clustering algorithm
+            clusterBtn.addEventListener('click', function() {
+                if (points.length === 0) {
+                    alert('Please generate a dataset first!');
+                    return;
+                }
+                
+                resetAnimation();
+                runClusteringAlgorithm();
+            });
+            
+            // Reset everything
+            resetBtn.addEventListener('click', function() {
+                resetAnimation();
+                points = [];
+                clusters = [];
+                centroids = [];
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                updateLegend();
+            });
+            
+            // Canvas mouse move for tooltip
+            canvas.addEventListener('mousemove', function(e) {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                // Find the closest point
+                let closestPoint = null;
+                let minDist = Infinity;
+                
+                points.forEach(point => {
+                    const dist = Math.sqrt(Math.pow(point.x - x, 2) + Math.pow(point.y - y, 2));
+                    if (dist < minDist && dist < 20) { // 20px radius for tooltip
+                        minDist = dist;
+                        closestPoint = point;
+                    }
+                });
+                
+                if (closestPoint) {
+                    tooltip.style.left = `${e.clientX + 10}px`;
+                    tooltip.style.top = `${e.clientY + 10}px`;
+                    tooltip.style.opacity = '1';
+                    tooltip.textContent = `(${closestPoint.x.toFixed(1)}, ${closestPoint.y.toFixed(1)})`;
+                } else {
+                    tooltip.style.opacity = '0';
+                }
+            });
+            
+            canvas.addEventListener('mouseout', function() {
+                tooltip.style.opacity = '0';
+            });
+            
+            // Window resize handler
+            window.addEventListener('resize', function() {
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+                drawPoints();
+            });
+            
+            // Helper functions
+            function resetAnimation() {
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                    animationId = null;
+                }
+                isAnimating = false;
+                currentStep = 0;
+                progressContainer.style.display = 'none';
+                progressBar.style.width = '0%';
+            }
+            
+            function generateDataset() {
+                const datasetType = document.getElementById('dataset-type').value;
+                const pointsCount = parseInt(document.getElementById('points-count').value);
+                const clustersCount = parseInt(document.getElementById('clusters-count').value);
+                const noiseLevel = parseFloat(document.getElementById('noise-level').value);
+                
+                points = [];
+                clusters = Array(clustersCount).fill().map((_, i) => ({
+                    id: i,
+                    color: colorPalette[i % colorPalette.length],
+                    points: []
+                }));
+                
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                const radius = Math.min(canvas.width, canvas.height) * 0.3;
+                
+                if (datasetType === 'blobs') {
+                    // Generate well-separated blobs
+                    for (let i = 0; i < clustersCount; i++) {
+                        const angle = (i * 2 * Math.PI) / clustersCount;
+                        const clusterCenterX = centerX + Math.cos(angle) * radius * 0.6;
+                        const clusterCenterY = centerY + Math.sin(angle) * radius * 0.6;
+                        const clusterRadius = radius * 0.2;
+                        
+                        const pointsPerCluster = Math.floor(pointsCount / clustersCount);
+                        for (let j = 0; j < pointsPerCluster; j++) {
+                            const r = clusterRadius * Math.sqrt(Math.random());
+                            const theta = Math.random() * 2 * Math.PI;
+                            const x = clusterCenterX + r * Math.cos(theta);
+                            const y = clusterCenterY + r * Math.sin(theta);
+                            
+                            // Add some noise
+                            const noisyX = x + (Math.random() - 0.5) * noiseLevel * canvas.width;
+                            const noisyY = y + (Math.random() - 0.5) * noiseLevel * canvas.height;
+                            
+                            points.push({
+                                x: noisyX,
+                                y: noisyY,
+                                originalCluster: i,
+                                cluster: null
+                            });
+                        }
+                    }
+                } else if (datasetType === 'moons') {
+                    // Generate two interleaving moons
+                    for (let i = 0; i < pointsCount; i++) {
+                        const isFirstMoon = i < pointsCount / 2;
+                        const angle = Math.PI * (i / (pointsCount / 2));
+                        
+                        let x, y;
+                        if (isFirstMoon) {
+                            x = centerX + Math.cos(angle) * radius * 0.4;
+                            y = centerY + Math.sin(angle) * radius * 0.4;
+                        } else {
+                            x = centerX + (1 - Math.cos(angle)) * radius * 0.4;
+                            y = centerY + (1 - Math.sin(angle)) * radius * 0.4 + radius * 0.3;
+                        }
+                        
+                        // Add some noise
+                        const noisyX = x + (Math.random() - 0.5) * noiseLevel * canvas.width;
+                        const noisyY = y + (Math.random() - 0.5) * noiseLevel * canvas.height;
+                        
+                        points.push({
+                            x: noisyX,
+                            y: noisyY,
+                            originalCluster: isFirstMoon ? 0 : 1,
+                            cluster: null
+                        });
+                    }
+                } else if (datasetType === 'circles') {
+                    // Generate concentric circles
+                    for (let i = 0; i < pointsCount; i++) {
+                        const isInnerCircle = i < pointsCount / 2;
+                        const angle = Math.random() * 2 * Math.PI;
+                        const r = isInnerCircle ? 
+                            radius * 0.2 * Math.sqrt(Math.random()) : 
+                            radius * (0.4 + 0.2 * Math.sqrt(Math.random()));
+                        
+                        const x = centerX + r * Math.cos(angle);
+                        const y = centerY + r * Math.sin(angle);
+                        
+                        // Add some noise
+                        const noisyX = x + (Math.random() - 0.5) * noiseLevel * canvas.width;
+                        const noisyY = y + (Math.random() - 0.5) * noiseLevel * canvas.height;
+                        
+                        points.push({
+                            x: noisyX,
+                            y: noisyY,
+                            originalCluster: isInnerCircle ? 0 : 1,
+                            cluster: null
+                        });
+                    }
+                } else if (datasetType === 'random') {
+                    // Generate completely random points
+                    for (let i = 0; i < pointsCount; i++) {
+                        const x = Math.random() * canvas.width;
+                        const y = Math.random() * canvas.height;
+                        
+                        points.push({
+                            x: x,
+                            y: y,
+                            originalCluster: Math.floor(Math.random() * clustersCount),
+                            cluster: null
+                        });
+                    }
+                } else if (datasetType === 'anisotropic') {
+                    // Generate stretched blobs
+                    for (let i = 0; i < clustersCount; i++) {
+                        const angle = (i * 2 * Math.PI) / clustersCount;
+                        const clusterCenterX = centerX + Math.cos(angle) * radius * 0.6;
+                        const clusterCenterY = centerY + Math.sin(angle) * radius * 0.6;
+                        
+                        const pointsPerCluster = Math.floor(pointsCount / clustersCount);
+                        for (let j = 0; j < pointsPerCluster; j++) {
+                            // Create anisotropic distribution
+                            const r1 = radius * 0.3 * Math.sqrt(Math.random());
+                            const r2 = radius * 0.1 * Math.sqrt(Math.random());
+                            const theta = Math.random() * 2 * Math.PI;
+                            
+                            // Stretch in one direction
+                            const stretchAngle = angle + Math.PI/4;
+                            const x = clusterCenterX + r1 * Math.cos(theta) * Math.cos(stretchAngle) - r2 * Math.sin(theta) * Math.sin(stretchAngle);
+                            const y = clusterCenterY + r1 * Math.cos(theta) * Math.sin(stretchAngle) + r2 * Math.sin(theta) * Math.cos(stretchAngle);
+                            
+                            // Add some noise
+                            const noisyX = x + (Math.random() - 0.5) * noiseLevel * canvas.width;
+                            const noisyY = y + (Math.random() - 0.5) * noiseLevel * canvas.height;
+                            
+                            points.push({
+                                x: noisyX,
+                                y: noisyY,
+                                originalCluster: i,
+                                cluster: null
+                            });
+                        }
+                    }
+                }
+            }
+            
+            function drawPoints() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw points
+                points.forEach(point => {
+                    ctx.beginPath();
+                    ctx.arc(point.x, point.y, 5, 0, 2 * Math.PI);
+                    
+                    if (point.cluster !== null && point.cluster !== undefined) {
+                        ctx.fillStyle = clusters[point.cluster]?.color || '#999';
+                    } else {
+                        ctx.fillStyle = '#999';
+                    }
+                    
+                    ctx.fill();
+                    ctx.strokeStyle = 'white';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                });
+                
+                // Draw centroids if they exist
+                centroids.forEach((centroid, i) => {
+                    ctx.beginPath();
+                    ctx.arc(centroid.x, centroid.y, 10, 0, 2 * Math.PI);
+                    ctx.fillStyle = clusters[i]?.color || '#333';
+                    ctx.fill();
+                    
+                    // Draw a cross inside the centroid
+                    ctx.strokeStyle = 'white';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(centroid.x - 6, centroid.y);
+                    ctx.lineTo(centroid.x + 6, centroid.y);
+                    ctx.moveTo(centroid.x, centroid.y - 6);
+                    ctx.lineTo(centroid.x, centroid.y + 6);
+                    ctx.stroke();
+                });
+            }
+            
+            function updateLegend() {
+                const legend = document.getElementById('legend');
+                legend.innerHTML = '';
+                
+                if (clusters.length > 0) {
+                    clusters.forEach(cluster => {
+                        const legendItem = document.createElement('div');
+                        legendItem.className = 'legend-item';
+                        
+                        const legendColor = document.createElement('div');
+                        legendColor.className = 'legend-color';
+                        legendColor.style.backgroundColor = cluster.color;
+                        
+                        const legendText = document.createTextNode(`Cluster ${cluster.id + 1}`);
+                        
+                        legendItem.appendChild(legendColor);
+                        legendItem.appendChild(legendText);
+                        legend.appendChild(legendItem);
+                    });
+                } else {
+                    const legendItem = document.createElement('div');
+                    legendItem.className = 'legend-item';
+                    legendItem.textContent = 'No clusters assigned';
+                    legend.appendChild(legendItem);
+                }
+            }
+            
+            function updateAlgorithmInfo(algorithm) {
+                let info = '';
+                
+                switch (algorithm) {
+                    case 'kmeans':
+                        info = `
+                            <h3>K-Means Clustering</h3>
+                            <p>K-Means is a centroid-based algorithm that partitions data into K distinct clusters based on distance metrics. It works by iteratively assigning points to the nearest centroid and recalculating centroids until convergence.</p>
+                            <p><strong>Strengths:</strong> Simple, efficient for large datasets, works well with spherical clusters.</p>
+                            <p><strong>Weaknesses:</strong> Requires specifying K, sensitive to initialization, struggles with non-spherical clusters.</p>
+                        `;
+                        break;
+                    case 'dbscan':
+                        info = `
+                            <h3>DBSCAN (Density-Based Spatial Clustering)</h3>
+                            <p>DBSCAN groups together points that are closely packed together, marking points that lie alone in low-density regions as outliers.</p>
+                            <p><strong>Strengths:</strong> Doesn't require specifying number of clusters, can find arbitrarily shaped clusters, robust to outliers.</p>
+                            <p><strong>Weaknesses:</strong> Struggles with varying densities, sensitive to parameter selection (ε and min_samples).</p>
+                        `;
+                        break;
+                    case 'hierarchical':
+                        info = `
+                            <h3>Hierarchical Clustering</h3>
+                            <p>Hierarchical clustering builds a multilevel hierarchy of clusters by creating a dendrogram. Can be agglomerative (bottom-up) or divisive (top-down).</p>
+                            <p><strong>Strengths:</strong> No need to specify number of clusters, produces intuitive dendrogram, works with any similarity measure.</p>
+                            <p><strong>Weaknesses:</strong> Computationally expensive (O(n³)), sensitive to noise and outliers.</p>
+                        `;
+                        break;
+                    case 'gmm':
+                        info = `
+                            <h3>Gaussian Mixture Models</h3>
+                            <p>GMM assumes data is generated from a mixture of several Gaussian distributions with unknown parameters. It uses expectation-maximization to estimate these parameters.</p>
+                            <p><strong>Strengths:</strong> Soft clustering (probabilistic assignments), can model elliptical clusters, works well with overlapping clusters.</p>
+                            <p><strong>Weaknesses:</strong> Sensitive to initialization, can converge to local optima, computationally intensive.</p>
+                        `;
+                        break;
+                    case 'spectral':
+                        info = `
+                            <h3>Spectral Clustering</h3>
+                            <p>Spectral clustering uses the eigenvalues of a similarity matrix to perform dimensionality reduction before clustering in fewer dimensions.</p>
+                            <p><strong>Strengths:</strong> Can find complex cluster structures, works well with non-convex clusters.</p>
+                            <p><strong>Weaknesses:</strong> Computationally expensive for large datasets, sensitive to parameters like gamma.</p>
+                        `;
+                        break;
+                    case 'optics':
+                        info = `
+                            <h3>OPTICS (Ordering Points To Identify the Clustering Structure)</h3>
+                            <p>OPTICS is a density-based algorithm similar to DBSCAN but handles varying densities better by creating a reachability plot.</p>
+                            <p><strong>Strengths:</strong> Can find clusters of varying densities, doesn't require specifying number of clusters.</p>
+                            <p><strong>Weaknesses:</strong> More complex than DBSCAN, still sensitive to parameter selection.</p>
+                        `;
+                        break;
+                    case 'meanshift':
+                        info = `
+                            <h3>Mean Shift Clustering</h3>
+                            <p>Mean shift is a hill-climbing algorithm that finds the modes (peaks) of a density function given discrete data sampled from that function.</p>
+                            <p><strong>Strengths:</strong> Doesn't require specifying number of clusters, can find arbitrarily shaped clusters.</p>
+                            <p><strong>Weaknesses:</strong> Computationally expensive, sensitive to bandwidth parameter.</p>
+                        `;
+                        break;
+                    case 'affinity':
+                        info = `
+                            <h3>Affinity Propagation</h3>
+                            <p>Affinity propagation creates clusters by sending messages between pairs of samples until convergence, identifying exemplars that best represent clusters.</p>
+                            <p><strong>Strengths:</strong> Doesn't require specifying number of clusters, works well with small to medium datasets.</p>
+                            <p><strong>Weaknesses:</strong> Computationally expensive (O(n²)), memory intensive for large datasets.</p>
+                        `;
+                        break;
+                }
+                
+                algorithmInfo.innerHTML = info;
+            }
+            
+            function runClusteringAlgorithm() {
+                const algorithm = document.getElementById('algorithm').value;
+                
+                // Reset clusters
+                clusters.forEach(cluster => {
+                    cluster.points = [];
+                });
+                
+                // Reset point assignments
+                points.forEach(point => {
+                    point.cluster = null;
+                });
+                
+                // Run the selected algorithm
+                switch (algorithm) {
+                    case 'kmeans':
+                        runKMeans();
+                        break;
+                    case 'dbscan':
+                        runDBSCAN();
+                        break;
+                    case 'hierarchical':
+                        runHierarchical();
+                        break;
+                    case 'gmm':
+                        runGMM();
+                        break;
+                    case 'spectral':
+                        runSpectral();
+                        break;
+                    case 'optics':
+                        runOPTICS();
+                        break;
+                    case 'meanshift':
+                        runMeanShift();
+                        break;
+                    case 'affinity':
+                        runAffinityPropagation();
+                        break;
+                }
+            }
+            
+            function runKMeans() {
+                const k = parseInt(document.getElementById('clusters-count').value);
+                const maxIterations = parseInt(document.getElementById('kmeans-iterations').value);
+                
+                // Initialize clusters if needed
+                if (clusters.length !== k) {
+                    clusters = Array(k).fill().map((_, i) => ({
+                        id: i,
+                        color: colorPalette[i % colorPalette.length],
+                        points: []
+                    }));
+                }
+                
+                // Initialize centroids randomly
+                centroids = [];
+                for (let i = 0; i < k; i++) {
+                    const randomPoint = points[Math.floor(Math.random() * points.length)];
+                    centroids.push({
+                        x: randomPoint.x,
+                        y: randomPoint.y,
+                        cluster: i
+                    });
+                }
+                
+                // Prepare for animation
+                currentStep = 0;
+                maxSteps = maxIterations * 2; // Assign + update steps
+                isAnimating = true;
+                progressContainer.style.display = 'block';
+                
+                // Start animation loop
+                animateKMeans();
+            }
+            
+            function animateKMeans() {
+                if (!isAnimating) return;
+                
+                // Show progress
+                progressBar.style.width = `${(currentStep / maxSteps) * 100}%`;
+                
+                // Even steps: assign points to clusters
+                if (currentStep % 2 === 0) {
+                    const iteration = Math.floor(currentStep / 2);
+                    
+                    // Assign each point to the nearest centroid
+                    points.forEach(point => {
+                        let minDist = Infinity;
+                        let closestCentroid = null;
+                        
+                        centroids.forEach(centroid => {
+                            const dist = Math.sqrt(
+                                Math.pow(point.x - centroid.x, 2) + 
+                                Math.pow(point.y - centroid.y, 2)
+                            );
+                            
+                            if (dist < minDist) {
+                                minDist = dist;
+                                closestCentroid = centroid.cluster;
+                            }
+                        });
+                        
+                        point.cluster = closestCentroid;
+                    });
+                    
+                    // Update cluster points
+                    clusters.forEach(cluster => {
+                        cluster.points = points.filter(p => p.cluster === cluster.id);
+                    });
+                    
+                    drawPoints();
+                } 
+                // Odd steps: update centroids
+                else {
+                    const iteration = Math.floor(currentStep / 2);
+                    
+                    // Update centroids to be the mean of their points
+                    centroids.forEach(centroid => {
+                        const clusterPoints = points.filter(p => p.cluster === centroid.cluster);
+                        
+                        if (clusterPoints.length > 0) {
+                            const sumX = clusterPoints.reduce((sum, p) => sum + p.x, 0);
+                            const sumY = clusterPoints.reduce((sum, p) => sum + p.y, 0);
+                            
+                            centroid.x = sumX / clusterPoints.length;
+                            centroid.y = sumY / clusterPoints.length;
+                        }
+                    });
+                    
+                    drawPoints();
+                }
+                
+                currentStep++;
+                
+                if (currentStep < maxSteps) {
+                    // Continue animation
+                    animationId = setTimeout(() => {
+                        animateKMeans();
+                    }, 800); // Animation speed
+                } else {
+                    // Animation complete
+                    isAnimating = false;
+                    progressBar.style.width = '100%';
+                    updateLegend();
+                }
+            }
+            
+            function runDBSCAN() {
+                const eps = parseFloat(document.getElementById('dbscan-eps').value);
+                const minSamples = parseInt(document.getElementById('dbscan-min-samples').value);
+                
+                // Scale epsilon to canvas dimensions
+                const scaledEps = eps * Math.min(canvas.width, canvas.height);
+                
+                // Reset clusters (DBSCAN can have noise points)
+                clusters = [{
+                    id: 0,
+                    color: colorPalette[0],
+                    points: []
+                }];
+                
+                let clusterId = 0;
+                const visited = new Set();
+                const noisePoints = [];
+                
+                // Prepare for animation
+                currentStep = 0;
+                maxSteps = points.length;
+                isAnimating = true;
+                progressContainer.style.display = 'block';
+                
+                // Start animation
+                animateDBSCAN();
+                
+                function animateDBSCAN() {
+                    if (!isAnimating) return;
+                    
+                    // Show progress
+                    progressBar.style.width = `${(currentStep / maxSteps) * 100}%`;
+                    
+                    const point = points[currentStep];
+                    
+                    if (!visited.has(currentStep)) {
+                        visited.add(currentStep);
+                        
+                        // Find all points within ε distance
+                        const neighbors = [];
+                        for (let i = 0; i < points.length; i++) {
+                            if (i === currentStep) continue;
+                            
+                            const dist = Math.sqrt(
+                                Math.pow(point.x - points[i].x, 2) + 
+                                Math.pow(point.y - points[i].y, 2)
+                            );
+                            
+                            if (dist <= scaledEps) {
+                                neighbors.push(i);
+                            }
+                        }
+                        
+                        if (neighbors.length < minSamples) {
+                            // Mark as noise (may be reassigned later)
+                            point.cluster = -1; // -1 for noise
+                            noisePoints.push(currentStep);
+                        } else {
+                            // Start a new cluster
+                            clusterId++;
+                            clusters.push({
+                                id: clusterId,
+                                color: colorPalette[clusterId % colorPalette.length],
+                                points: []
+                            });
+                            
+                            // Expand the cluster
+                            expandCluster(currentStep, neighbors, clusterId, visited, scaledEps, minSamples);
+                        }
+                    }
+                    
+                    // Update visualization
+                    drawPoints();
+                    
+                    currentStep++;
+                    
+                    if (currentStep < maxSteps) {
+                        animationId = setTimeout(() => {
+                            animateDBSCAN();
+                        }, 100); // Faster animation for DBSCAN
+                    } else {
+                        // Animation complete
+                        isAnimating = false;
+                        progressBar.style.width = '100%';
+                        
+                        // Assign noise points to a special "noise" cluster
+                        if (noisePoints.length > 0) {
+                            clusters[0].points = noisePoints.map(i => points[i]);
+                            clusters[0].color = '#999';
+                        } else {
+                            clusters.shift(); // Remove the empty noise cluster
+                        }
+                        
+                        updateLegend();
+                    }
+                }
+                
+                function expandCluster(pointIndex, neighbors, clusterId, visited, eps, minSamples) {
+                    clusters[clusterId].points.push(points[pointIndex]);
+                    points[pointIndex].cluster = clusterId;
+                    
+                    for (let i = 0; i < neighbors.length; i++) {
+                        const neighborIndex = neighbors[i];
+                        
+                        if (!visited.has(neighborIndex)) {
+                            visited.add(neighborIndex);
+                            
+                            // Find neighbors of this neighbor
+                            const neighborNeighbors = [];
+                            for (let j = 0; j < points.length; j++) {
+                                if (j === neighborIndex) continue;
+                                
+                                const dist = Math.sqrt(
+                                    Math.pow(points[neighborIndex].x - points[j].x, 2) + 
+                                    Math.pow(points[neighborIndex].y - points[j].y, 2)
+                                );
+                                
+                                if (dist <= eps) {
+                                    neighborNeighbors.push(j);
+                                }
+                            }
+                            
+                            if (neighborNeighbors.length >= minSamples) {
+                                // Add new neighbors to the list
+                                neighbors.push(...neighborNeighbors.filter(n => !neighbors.includes(n)));
+                            }
+                        }
+                        
+                        // If the point isn't assigned to any cluster, add it to this one
+                        if (points[neighborIndex].cluster === null || points[neighborIndex].cluster === -1) {
+                            points[neighborIndex].cluster = clusterId;
+                            clusters[clusterId].points.push(points[neighborIndex]);
+                        }
+                    }
+                }
+            }
+            
+            // Simplified implementations of other algorithms (would be more complex in reality)
+            function runHierarchical() {
+                const linkage = document.getElementById('hierarchical-linkage').value;
+                const k = parseInt(document.getElementById('clusters-count').value);
+                
+                // Reset clusters
+                clusters = Array(k).fill().map((_, i) => ({
+                    id: i,
+                    color: colorPalette[i % colorPalette.length],
+                    points: []
+                }));
+                
+                // For visualization purposes, we'll simulate hierarchical clustering
+                // In a real implementation, we'd use a proper algorithm
+                
+                // Start with each point in its own cluster
+                let pointClusters = points.map((p, i) => [i]);
+                
+                // Prepare for animation
+                currentStep = 0;
+                maxSteps = points.length - k; // Number of merges needed
+                isAnimating = true;
+                progressContainer.style.display = 'block';
+                
+                animateHierarchical();
+                
+                function animateHierarchical() {
+                    if (!isAnimating) return;
+                    
+                    progressBar.style.width = `${(currentStep / maxSteps) * 100}%`;
+                    
+                    if (pointClusters.length > k) {
+                        // Find two closest clusters to merge (simplified)
+                        let minDist = Infinity;
+                        let cluster1 = 0;
+                        let cluster2 = 1;
+                        
+                        for (let i = 0; i < pointClusters.length; i++) {
+                            for (let j = i + 1; j < pointClusters.length; j++) {
+                                // Calculate distance between clusters based on linkage
+                                let dist;
+                                if (linkage === 'single') {
+                                    dist = singleLinkageDistance(pointClusters[i], pointClusters[j]);
+                                } else if (linkage === 'complete') {
+                                    dist = completeLinkageDistance(pointClusters[i], pointClusters[j]);
+                                } else if (linkage === 'average') {
+                                    dist = averageLinkageDistance(pointClusters[i], pointClusters[j]);
+                                } else { // ward
+                                    dist = wardDistance(pointClusters[i], pointClusters[j]);
+                                }
+                                
+                                if (dist < minDist) {
+                                    minDist = dist;
+                                    cluster1 = i;
+                                    cluster2 = j;
+                                }
+                            }
+                        }
+                        
+                        // Merge the two closest clusters
+                        const mergedCluster = [...pointClusters[cluster1], ...pointClusters[cluster2]];
+                        pointClusters = pointClusters.filter((_, idx) => idx !== cluster1 && idx !== cluster2);
+                        pointClusters.push(mergedCluster);
+                        
+                        // Update point assignments for visualization
+                        pointClusters.forEach((cluster, clusterIdx) => {
+                            cluster.forEach(pointIdx => {
+                                points[pointIdx].cluster = clusterIdx % k; // For visualization only
+                            });
+                        });
+                        
+                        drawPoints();
+                        currentStep++;
+                        
+                        animationId = setTimeout(() => {
+                            animateHierarchical();
+                        }, 500);
+                    } else {
+                        // Assign final clusters
+                        pointClusters.forEach((cluster, clusterIdx) => {
+                            clusters[clusterIdx].points = cluster.map(i => points[i]);
+                            cluster.forEach(pointIdx => {
+                                points[pointIdx].cluster = clusterIdx;
+                            });
+                        });
+                        
+                        drawPoints();
+                        isAnimating = false;
+                        progressBar.style.width = '100%';
+                        updateLegend();
+                    }
+                }
+                
+                // Distance calculation methods
+                function singleLinkageDistance(cluster1, cluster2) {
+                    let minDist = Infinity;
+                    for (const i of cluster1) {
+                        for (const j of cluster2) {
+                            const dist = Math.sqrt(
+                                Math.pow(points[i].x - points[j].x, 2) + 
+                                Math.pow(points[i].y - points[j].y, 2)
+                            );
+                            if (dist < minDist) minDist = dist;
+                        }
+                    }
+                    return minDist;
+                }
+                
+                function completeLinkageDistance(cluster1, cluster2) {
+                    let maxDist = 0;
+                    for (const i of cluster1) {
+                        for (const j of cluster2) {
+                            const dist = Math.sqrt(
+                                Math.pow(points[i].x - points[j].x, 2) + 
+                                Math.pow(points[i].y - points[j].y, 2)
+                            );
+                            if (dist > maxDist) maxDist = dist;
+                        }
+                    }
+                    return maxDist;
+                }
+                
+                function averageLinkageDistance(cluster1, cluster2) {
+                    let totalDist = 0;
+                    let count = 0;
+                    for (const i of cluster1) {
+                        for (const j of cluster2) {
+                            totalDist += Math.sqrt(
+                                Math.pow(points[i].x - points[j].x, 2) + 
+                                Math.pow(points[i].y - points[j].y, 2)
+                            );
+                            count++;
+                        }
+                    }
+                    return totalDist / count;
+                }
+                
+                function wardDistance(cluster1, cluster2) {
+                    // Simplified Ward's distance - in reality would need to track centroids and sizes
+                    const centroid1 = calculateCentroid(cluster1);
+                    const centroid2 = calculateCentroid(cluster2);
+                    return Math.sqrt(
+                        Math.pow(centroid1.x - centroid2.x, 2) + 
+                        Math.pow(centroid1.y - centroid2.y, 2)
+                    );
+                }
+                
+                function calculateCentroid(cluster) {
+                    const sumX = cluster.reduce((sum, i) => sum + points[i].x, 0);
+                    const sumY = cluster.reduce((sum, i) => sum + points[i].y, 0);
+                    return {
+                        x: sumX / cluster.length,
+                        y: sumY / cluster.length
+                    };
+                }
+            }
+            
+            function runGMM() {
+                const k = parseInt(document.getElementById('clusters-count').value);
+                const covarianceType = document.getElementById('gmm-covariance').value;
+                
+                // Reset clusters
+                clusters = Array(k).fill().map((_, i) => ({
+                    id: i,
+                    color: colorPalette[i % colorPalette.length],
+                    points: []
+                }));
+                
+                // For visualization, we'll simulate EM algorithm steps
+                
+                // 1. Initialize parameters randomly
+                const means = [];
+                const covariances = [];
+                const weights = Array(k).fill(1/k);
+                
+                for (let i = 0; i < k; i++) {
+                    const randomPoint = points[Math.floor(Math.random() * points.length)];
+                    means.push({ x: randomPoint.x, y: randomPoint.y });
+                    
+                    // Initialize covariance based on type
+                    if (covarianceType === 'full') {
+                        covariances.push([
+                            [canvas.width * 0.1, 0],
+                            [0, canvas.height * 0.1]
+                        ]);
+                    } else if (covarianceType === 'tied') {
+                        // All clusters share the same covariance
+                        covariances.push([
+                            [canvas.width * 0.1, 0],
+                            [0, canvas.height * 0.1]
+                        ]);
+                    } else if (covarianceType === 'diag') {
+                        covariances.push([
+                            [canvas.width * 0.1, 0],
+                            [0, canvas.height * 0.1]
+                        ]);
+                    } else { // spherical
+                        covariances.push([
+                            [canvas.width * 0.1, 0],
+                            [0, canvas.width * 0.1]
+                        ]);
+                    }
+                }
+                
+                // Prepare for animation
+                currentStep = 0;
+                maxSteps = 10; // EM iterations
+                isAnimating = true;
+                progressContainer.style.display = 'block';
+                
+                animateGMM();
+                
+                function animateGMM() {
+                    if (!isAnimating) return;
+                    
+                    progressBar.style.width = `${(currentStep / maxSteps) * 100}%`;
+                    
+                    // E-step: Calculate responsibilities
+                    const responsibilities = points.map(point => {
+                        const pointProbs = [];
+                        let sumProbs = 0;
+                        
+                        for (let i = 0; i < k; i++) {
+                            const mean = means[i];
+                            const covariance = covariances[i];
+                            
+                            // Simplified 2D Gaussian PDF calculation
+                            const det = covariance[0][0] * covariance[1][1] - covariance[0][1] * covariance[1][0];
+                            const diffX = point.x - mean.x;
+                            const diffY = point.y - mean.y;
+                            
+                            // Mahalanobis distance
+                            const exponent = -0.5 * (
+                                (diffX * diffX * covariance[1][1] + diffY * diffY * covariance[0][0] - 
+                                 2 * diffX * diffY * covariance[0][1]) / det
+                            );
+                            
+                            const prob = weights[i] * Math.exp(exponent) / (2 * Math.PI * Math.sqrt(det));
+                            pointProbs.push(prob);
+                            sumProbs += prob;
+                        }
+                        
+                        // Normalize to get responsibilities
+                        return pointProbs.map(p => p / sumProbs);
+                    });
+                    
+                    // Assign points to most probable cluster for visualization
+                    responsibilities.forEach((probs, pointIdx) => {
+                        let maxProb = 0;
+                        let bestCluster = 0;
+                        
+                        probs.forEach((prob, clusterIdx) => {
+                            if (prob > maxProb) {
+                                maxProb = prob;
+                                bestCluster = clusterIdx;
+                            }
+                        });
+                        
+                        points[pointIdx].cluster = bestCluster;
+                    });
+                    
+                    // M-step: Update parameters (simplified)
+                    if (currentStep < maxSteps - 1) {
+                        for (let i = 0; i < k; i++) {
+                            // Update means
+                            let sumX = 0;
+                            let sumY = 0;
+                            let sumResp = 0;
+                            
+                            points.forEach((point, pointIdx) => {
+                                const resp = responsibilities[pointIdx][i];
+                                sumX += point.x * resp;
+                                sumY += point.y * resp;
+                                sumResp += resp;
+                            });
+                            
+                            means[i] = {
+                                x: sumX / sumResp,
+                                y: sumY / sumResp
+                            };
+                            
+                            // Update weights
+                            weights[i] = sumResp / points.length;
+                            
+                            // Update covariances (simplified)
+                            if (covarianceType === 'full' || covarianceType === 'tied') {
+                                // Full covariance update
+                                let sumXX = 0;
+                                let sumYY = 0;
+                                let sumXY = 0;
+                                
+                                points.forEach((point, pointIdx) => {
+                                    const resp = responsibilities[pointIdx][i];
+                                    const diffX = point.x - means[i].x;
+                                    const diffY = point.y - means[i].y;
+                                    
+                                    sumXX += resp * diffX * diffX;
+                                    sumYY += resp * diffY * diffY;
+                                    sumXY += resp * diffX * diffY;
+                                });
+                                
+                                covariances[i] = [
+                                    [sumXX / sumResp, sumXY / sumResp],
+                                    [sumXY / sumResp, sumYY / sumResp]
+                                ];
+                            } else if (covarianceType === 'diag') {
+                                // Diagonal covariance
+                                let sumXX = 0;
+                                let sumYY = 0;
+                                
+                                points.forEach((point, pointIdx) => {
+                                    const resp = responsibilities[pointIdx][i];
+                                    const diffX = point.x - means[i].x;
+                                    const diffY = point.y - means[i].y;
+                                    
+                                    sumXX += resp * diffX * diffX;
+                                    sumYY += resp * diffY * diffY;
+                                });
+                                
+                                covariances[i] = [
+                                    [sumXX / sumResp, 0],
+                                    [0, sumYY / sumResp]
+                                ];
+                            } else {
+                                // Spherical covariance
+                                let sumDist = 0;
+                                
+                                points.forEach((point, pointIdx) => {
+                                    const resp = responsibilities[pointIdx][i];
+                                    const diffX = point.x - means[i].x;
+                                    const diffY = point.y - means[i].y;
+                                    
+                                    sumDist += resp * (diffX * diffX + diffY * diffY);
+                                });
+                                
+                                const variance = sumDist / (2 * sumResp);
+                                covariances[i] = [
+                                    [variance, 0],
+                                    [0, variance]
+                                ];
+                            }
+                        }
+                        
+                        if (covarianceType === 'tied') {
+                            // All clusters share the same covariance matrix
+                            // Compute the weighted average of all covariances
+                            let totalSumXX = 0;
+                            let totalSumYY = 0;
+                            let totalSumXY = 0;
+                            let totalSumResp = 0;
+                            
+                            for (let i = 0; i < k; i++) {
+                                points.forEach((point, pointIdx) => {
+                                    const resp = responsibilities[pointIdx][i];
+                                    const diffX = point.x - means[i].x;
+                                    const diffY = point.y - means[i].y;
+                                    
+                                    totalSumXX += resp * diffX * diffX;
+                                    totalSumYY += resp * diffY * diffY;
+                                    totalSumXY += resp * diffX * diffY;
+                                    totalSumResp += resp;
+                                });
+                            }
+                            
+                            const tiedCovariance = [
+                                [totalSumXX / totalSumResp, totalSumXY / totalSumResp],
+                                [totalSumXY / totalSumResp, totalSumYY / totalSumResp]
+                            ];
+                            
+                            // Assign to all clusters
+                            for (let i = 0; i < k; i++) {
+                                covariances[i] = tiedCovariance;
+                            }
+                        }
+                    }
+                    
+                    // Update centroids for visualization
+                    centroids = means.map((mean, i) => ({
+                        x: mean.x,
+                        y: mean.y,
+                        cluster: i
+                    }));
+                    
+                    // Update cluster points
+                    clusters.forEach(cluster => {
+                        cluster.points = points.filter(p => p.cluster === cluster.id);
+                    });
+                    
+                    drawPoints();
+                    currentStep++;
+                    
+                    if (currentStep < maxSteps) {
+                        animationId = setTimeout(() => {
+                            animateGMM();
+                        }, 800);
+                    } else {
+                        isAnimating = false;
+                        progressBar.style.width = '100%';
+                        updateLegend();
+                    }
+                }
+            }
+            
+            function runSpectral() {
+                const k = parseInt(document.getElementById('clusters-count').value);
+                const gamma = parseFloat(document.getElementById('spectral-gamma').value);
+                
+                // Reset clusters
+                clusters = Array(k).fill().map((_, i) => ({
+                    id: i,
+                    color: colorPalette[i % colorPalette.length],
+                    points: []
+                }));
+                
+                // Spectral clustering is complex to implement, so we'll simulate it
+                
+                // Prepare for animation
+                currentStep = 0;
+                maxSteps = 5; // Steps in the spectral clustering process
+                isAnimating = true;
+                progressContainer.style.display = 'block';
+                
+                animateSpectral();
+                
+                function animateSpectral() {
+                    if (!isAnimating) return;
+                    
+                    progressBar.style.width = `${(currentStep / maxSteps) * 100}%`;
+                    
+                    // Simulate steps of spectral clustering
+                    if (currentStep === 0) {
+                        // Step 1: Compute similarity matrix (simulated)
+                        points.forEach(point => {
+                            point.cluster = Math.floor(Math.random() * k); // Random for visualization
+                        });
+                    } else if (currentStep === 1) {
+                        // Step 2: Compute graph Laplacian (simulated)
+                        // In reality would involve matrix operations
+                        points.forEach(point => {
+                            point.cluster = (point.cluster + 1) % k; // Change for visualization
+                        });
+                    } else if (currentStep === 2) {
+                        // Step 3: Compute eigenvectors (simulated)
+                        points.forEach(point => {
+                            point.cluster = (point.cluster + 2) % k; // Change for visualization
+                        });
+                    } else if (currentStep === 3) {
+                        // Step 4: Perform k-means in reduced space (simulated)
+                        // For visualization, we'll just run k-means on the original points
+                        const tempCentroids = [];
+                        for (let i = 0; i < k; i++) {
+                            const randomPoint = points[Math.floor(Math.random() * points.length)];
+                            tempCentroids.push({
+                                x: randomPoint.x,
+                                y: randomPoint.y,
+                                cluster: i
+                            });
+                        }
+                        
+                        // Assign points to nearest centroid
+                        points.forEach(point => {
+                            let minDist = Infinity;
+                            let closestCentroid = null;
+                            
+                            tempCentroids.forEach(centroid => {
+                                const dist = Math.sqrt(
+                                    Math.pow(point.x - centroid.x, 2) + 
+                                    Math.pow(point.y - centroid.y, 2)
+                                );
+                                
+                                if (dist < minDist) {
+                                    minDist = dist;
+                                    closestCentroid = centroid.cluster;
+                                }
+                            });
+                            
+                            point.cluster = closestCentroid;
+                        });
+                    } else if (currentStep === 4) {
+                        // Final assignment
+                        clusters.forEach(cluster => {
+                            cluster.points = points.filter(p => p.cluster === cluster.id);
+                        });
+                        
+                        // Compute centroids
+                        centroids = [];
+                        clusters.forEach(cluster => {
+                            if (cluster.points.length > 0) {
+                                const sumX = cluster.points.reduce((sum, p) => sum + p.x, 0);
+                                const sumY = cluster.points.reduce((sum, p) => sum + p.y, 0);
+                                centroids.push({
+                                    x: sumX / cluster.points.length,
+                                    y: sumY / cluster.points.length,
+                                    cluster: cluster.id
+                                });
+                            }
+                        });
+                    }
+                    
+                    drawPoints();
+                    currentStep++;
+                    
+                    if (currentStep < maxSteps) {
+                        animationId = setTimeout(() => {
+                            animateSpectral();
+                        }, 800);
+                    } else {
+                        isAnimating = false;
+                        progressBar.style.width = '100%';
+                        updateLegend();
+                    }
+                }
+            }
+            
+            function runOPTICS() {
+                const eps = parseFloat(document.getElementById('dbscan-eps').value);
+                const minSamples = parseInt(document.getElementById('dbscan-min-samples').value);
+                const xi = parseFloat(document.getElementById('optics-xi').value);
+                
+                // Scale epsilon to canvas dimensions
+                const scaledEps = eps * Math.min(canvas.width, canvas.height);
+                
+                // Reset clusters (OPTICS can have noise points)
+                clusters = [{
+                    id: 0,
+                    color: colorPalette[0],
+                    points: []
+                }];
+                
+                // OPTICS is complex, so we'll simulate it with DBSCAN-like behavior
+                
+                // Prepare for animation
+                currentStep = 0;
+                maxSteps = points.length;
+                isAnimating = true;
+                progressContainer.style.display = 'block';
+                
+                animateOPTICS();
+                
+                function animateOPTICS() {
+                    if (!isAnimating) return;
+                    
+                    progressBar.style.width = `${(currentStep / maxSteps) * 100}%`;
+                    
+                    // Simulate OPTICS by finding clusters based on reachability
+                    // In reality, OPTICS creates an ordering and then extracts clusters
+                    
+                    if (currentStep < points.length) {
+                        const point = points[currentStep];
+                        
+                        // Find all points within ε distance
+                        const neighbors = [];
+                        for (let i = 0; i < points.length; i++) {
+                            if (i === currentStep) continue;
+                            
+                            const dist = Math.sqrt(
+                                Math.pow(point.x - points[i].x, 2) + 
+                                Math.pow(point.y - points[i].y, 2)
+                            );
+                            
+                            if (dist <= scaledEps) {
+                                neighbors.push(i);
+                            }
+                        }
+                        
+                        if (neighbors.length >= minSamples) {
+                            // Core point - assign to a cluster
+                            if (point.cluster === null || point.cluster === -1) {
+                                // Find a cluster from neighbors or create new one
+                                let foundCluster = -1;
+                                for (const neighborIdx of neighbors) {
+                                    if (points[neighborIdx].cluster !== null && points[neighborIdx].cluster !== -1) {
+                                        foundCluster = points[neighborIdx].cluster;
+                                        break;
+                                    }
+                                }
+                                
+                                if (foundCluster === -1) {
+                                    // Create new cluster
+                                    foundCluster = clusters.length;
+                                    clusters.push({
+                                        id: foundCluster,
+                                        color: colorPalette[foundCluster % colorPalette.length],
+                                        points: []
+                                    });
+                                }
+                                
+                                point.cluster = foundCluster;
+                                clusters[foundCluster].points.push(point);
+                            }
+                        } else {
+                            // Noise point (may be reassigned later)
+                            point.cluster = -1;
+                            clusters[0].points.push(point);
+                        }
+                        
+                        drawPoints();
+                        currentStep++;
+                        
+                        animationId = setTimeout(() => {
+                            animateOPTICS();
+                        }, 100);
+                    } else {
+                        // Final processing based on reachability (simulated)
+                        // Here we would normally analyze the reachability plot to extract clusters
+                        
+                        // For visualization, we'll just keep the DBSCAN-like clusters
+                        if (clusters[0].points.length === 0) {
+                            clusters.shift(); // Remove empty noise cluster
+                        }
+                        
+                        isAnimating = false;
+                        progressBar.style.width = '100%';
+                        updateLegend();
+                    }
+                }
+            }
+            
+            function runMeanShift() {
+                const bandwidth = parseFloat(document.getElementById('dbscan-eps').value) * Math.min(canvas.width, canvas.height);
+                
+                // Mean shift is complex, so we'll simulate it
+                
+                // Reset clusters
+                clusters = [];
+                
+                // Prepare for animation
+                currentStep = 0;
+                maxSteps = 10; // Iterations
+                isAnimating = true;
+                progressContainer.style.display = 'block';
+                
+                // Create initial centroids (one per point)
+                let centroids = points.map(p => ({
+                    x: p.x,
+                    y: p.y,
+                    cluster: null
+                }));
+                
+                animateMeanShift();
+                
+                function animateMeanShift() {
+                    if (!isAnimating) return;
+                    
+                    progressBar.style.width = `${(currentStep / maxSteps) * 100}%`;
+                    
+                    // Mean shift iteration
+                    centroids = centroids.map(centroid => {
+                        // Find points within bandwidth
+                        const neighbors = points.filter(p => {
+                            const dist = Math.sqrt(
+                                Math.pow(p.x - centroid.x, 2) + 
+                                Math.pow(p.y - centroid.y, 2)
+                            );
+                            return dist <= bandwidth;
+                        });
+                        
+                        if (neighbors.length === 0) return centroid;
+                        
+                        // Compute mean of neighbors
+                        const sumX = neighbors.reduce((sum, p) => sum + p.x, 0);
+                        const sumY = neighbors.reduce((sum, p) => sum + p.y, 0);
+                        
+                        return {
+                            x: sumX / neighbors.length,
+                            y: sumY / neighbors.length,
+                            cluster: centroid.cluster
+                        };
+                    });
+                    
+                    // Merge nearby centroids (simplified)
+                    if (currentStep === maxSteps - 1) {
+                        const finalCentroids = [];
+                        const used = new Set();
+                        
+                        for (let i = 0; i < centroids.length; i++) {
+                            if (used.has(i)) continue;
+                            
+                            const current = centroids[i];
+                            const clusterPoints = [i];
+                            
+                            for (let j = i + 1; j < centroids.length; j++) {
+                                if (used.has(j)) continue;
+                                
+                                const dist = Math.sqrt(
+                                    Math.pow(current.x - centroids[j].x, 2) + 
+                                    Math.pow(current.y - centroids[j].y, 2)
+                                );
+                                
+                                if (dist <= bandwidth * 0.5) {
+                                    clusterPoints.push(j);
+                                    used.add(j);
+                                }
+                            }
+                            
+                            // Compute mean of merged centroids
+                            const sumX = clusterPoints.reduce((sum, idx) => sum + centroids[idx].x, 0);
+                            const sumY = clusterPoints.reduce((sum, idx) => sum + centroids[idx].y, 0);
+                            
+                            finalCentroids.push({
+                                x: sumX / clusterPoints.length,
+                                y: sumY / clusterPoints.length,
+                                cluster: finalCentroids.length
+                            });
+                        }
+                        
+                        centroids = finalCentroids;
+                        
+                        // Create clusters
+                        clusters = centroids.map((centroid, i) => ({
+                            id: i,
+                            color: colorPalette[i % colorPalette.length],
+                            points: []
+                        }));
+                        
+                        // Assign points to nearest centroid
+                        points.forEach(point => {
+                            let minDist = Infinity;
+                            let closestCentroid = null;
+                            
+                            centroids.forEach(centroid => {
+                                const dist = Math.sqrt(
+                                    Math.pow(point.x - centroid.x, 2) + 
+                                    Math.pow(point.y - centroid.y, 2)
+                                );
+                                
+                                if (dist < minDist) {
+                                    minDist = dist;
+                                    closestCentroid = centroid.cluster;
+                                }
+                            });
+                            
+                            point.cluster = closestCentroid;
+                            clusters[closestCentroid].points.push(point);
+                        });
+                    }
+                    
+                    // For visualization during iterations, show centroids moving
+                    if (currentStep < maxSteps - 1) {
+                        points.forEach(point => {
+                            // Find closest centroid
+                            let minDist = Infinity;
+                            let closestCentroid = null;
+                            
+                            centroids.forEach(centroid => {
+                                const dist = Math.sqrt(
+                                    Math.pow(point.x - centroid.x, 2) + 
+                                    Math.pow(point.y - centroid.y, 2)
+                                );
+                                
+                                if (dist < minDist) {
+                                    minDist = dist;
+                                    closestCentroid = centroid;
+                                }
+                            });
+                            
+                            // Assign to centroid's cluster (temporary)
+                            point.cluster = closestCentroid ? closestCentroid.cluster : null;
+                        });
+                    }
+                    
+                    drawPoints();
+                    currentStep++;
+                    
+                    if (currentStep < maxSteps) {
+                        animationId = setTimeout(() => {
+                            animateMeanShift();
+                        }, 800);
+                    } else {
+                        isAnimating = false;
+                        progressBar.style.width = '100%';
+                        updateLegend();
+                    }
+                }
+            }
+            
+            function runAffinityPropagation() {
+                // Affinity propagation is complex, so we'll simulate it
+                
+                // Reset clusters
+                clusters = [];
+                
+                // Prepare for animation
+                currentStep = 0;
+                maxSteps = 5; // Iterations
+                isAnimating = true;
+                progressContainer.style.display = 'block';
+                
+                animateAffinityPropagation();
+                
+                function animateAffinityPropagation() {
+                    if (!isAnimating) return;
+                    
+                    progressBar.style.width = `${(currentStep / maxSteps) * 100}%`;
+                    
+                    // Simulate affinity propagation iterations
+                    if (currentStep < maxSteps - 1) {
+                        // During iterations, randomly assign some points as exemplars
+                        points.forEach((point, i) => {
+                            if (Math.random() < 0.1) {
+                                // This point becomes an exemplar (cluster center)
+                                point.cluster = i;
+                                
+                                // Create a new cluster if needed
+                                if (!clusters.some(c => c.id === i)) {
+                                    clusters.push({
+                                        id: i,
+                                        color: colorPalette[i % colorPalette.length],
+                                        points: []
+                                    });
+                                }
+                            } else {
+                                point.cluster = null;
+                            }
+                        });
+                        
+                        // Assign non-exemplar points to nearest exemplar
+                        points.forEach(point => {
+                            if (point.cluster === null) {
+                                let minDist = Infinity;
+                                let closestExemplar = null;
+                                
+                                points.forEach(p => {
+                                    if (p.cluster === p.id) { // This is an exemplar
+                                        const dist = Math.sqrt(
+                                            Math.pow(point.x - p.x, 2) + 
+                                            Math.pow(point.y - p.y, 2)
+                                        );
+                                        
+                                        if (dist < minDist) {
+                                            minDist = dist;
+                                            closestExemplar = p.cluster;
+                                        }
+                                    }
+                                });
+                                
+                                point.cluster = closestExemplar;
+                            }
+                        });
+                    } else {
+                        // Final assignment
+                        // Identify exemplars (points that are their own cluster)
+                        const exemplars = points.filter(p => p.cluster === p.id);
+                        
+                        // Reset clusters
+                        clusters = exemplars.map((exemplar, i) => ({
+                            id: exemplar.id,
+                            color: colorPalette[i % colorPalette.length],
+                            points: []
+                        }));
+                        
+                        // Assign all points to their exemplar's cluster
+                        points.forEach(point => {
+                            const exemplarId = point.cluster;
+                            const cluster = clusters.find(c => c.id === exemplarId);
+                            if (cluster) {
+                                cluster.points.push(point);
+                            }
+                        });
+                        
+                        // Remove empty clusters
+                        clusters = clusters.filter(c => c.points.length > 0);
+                        
+                        // Update centroids
+                        centroids = clusters.map(cluster => {
+                            const exemplar = points.find(p => p.id === cluster.id);
+                            return {
+                                x: exemplar.x,
+                                y: exemplar.y,
+                                cluster: cluster.id
+                            };
+                        });
+                    }
+                    
+                    // Update cluster points
+                    clusters.forEach(cluster => {
+                        cluster.points = points.filter(p => p.cluster === cluster.id);
+                    });
+                    
+                    drawPoints();
+                    currentStep++;
+                    
+                    if (currentStep < maxSteps) {
+                        animationId = setTimeout(() => {
+                            animateAffinityPropagation();
+                        }, 800);
+                    } else {
+                        isAnimating = false;
+                        progressBar.style.width = '100%';
+                        updateLegend();
+                    }
+                }
+            }
+            
+            // Initialize
+            updateAlgorithmInfo('kmeans');
+            generateDataset();
+            drawPoints();
+            updateLegend();
+        });
+    </script>
+</body>
+</html>
