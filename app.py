@@ -3,11 +3,9 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain.chains import LLMChain
 import os
-import API_KEYS as keys
 
 
-os.environ["GROQ_API_KEY"] = keys.GROQ_API_KEY
-os.environ["LANGCHAIN_API_KEY"]=keys.LANGCHAIN_API_KEY
+os.environ["GROQ_API_KEY"] = "your api key"
 
 llama = ChatGroq(
     model="meta-llama/llama-4-scout-17b-16e-instruct",
