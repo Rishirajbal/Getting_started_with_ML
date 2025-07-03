@@ -24,8 +24,8 @@ from langchain_tavily import TavilySearch
 import os
 from langgraph.graph.message import add_messages
 
-os.environ["GROQ_API_KEY"]="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"
-os.environ["TAVILY_API_KEY"]="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"
+os.environ["GROQ_API_KEY"]=#your api
+os.environ["TAVILY_API_KEY"]=#your api
 model=ChatGroq(model="meta-llama/llama-4-scout-17b-16e-instruct",temperature=0.3)
 
 class state(TypedDict):
