@@ -4,3 +4,4 @@
 
 # for Tensorflow updates follow my colab notebooks
 **[1. Getting started with tf and tf.keras and basic CNN](https://colab.research.google.com/drive/1_eTAZAe8PM9-Qc4PziseOSpDY54zZVGh?usp=sharing)**
+**[2.CIFAR10 DATASET CNN](https://colab.research.google.com/drive/1PuVhCrDrhg7v_gDZKHpbXytSPI5S-EhN#scrollTo=GoH9_OTNIiD9)**
